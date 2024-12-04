@@ -121,10 +121,10 @@ bool Parser::parsePids(yarp::os::Searchable &config, PidInfo *ppids, PidInfo *vp
     if(!parseSelectedPosDirectControl(config)) // OK
         return false;
 
-    // usa _velDirectControlLaw per recuperare i PID
-    // del velocity direct control per ogni giunto
-    if(!parseSelectedVelDirectControl(config)) // OK
-        return false;
+    // // usa _velDirectControlLaw per recuperare i PID
+    // // del velocity direct control per ogni giunto
+    // if(!parseSelectedVelDirectControl(config)) // OK
+    //     return false;
 
     // usa _torqueControlLaw per recuperare i PID
     // del torque control per ogni giunto
@@ -169,9 +169,9 @@ bool Parser::parseControlsGroup(yarp::os::Searchable &config) // OK
         return false;
     LOAD_STRINGS(_posDirectControlLaw, xtmp);
 
-    if (!extractGroup(controlsGroup, xtmp, "velDirectControl", "Velocity Direct Control ", _njoints)) 
-        return false;
-    LOAD_STRINGS(_velDirectControlLaw, xtmp);
+    // if (!extractGroup(controlsGroup, xtmp, "velDirectControl", "Velocity Direct Control ", _njoints)) 
+    //     return false;
+    // LOAD_STRINGS(_velDirectControlLaw, xtmp);
 
     if (!extractGroup(controlsGroup, xtmp, "torqueControl", "Torque Control ", _njoints))
         return false;

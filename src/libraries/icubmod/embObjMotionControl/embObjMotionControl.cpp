@@ -919,7 +919,7 @@ bool embObjMotionControl::fromConfig_Step2(yarp::os::Searchable &config)
     ///////////////INIT INTERFACES
     _measureConverter = new ControlBoardHelper(_njoints, _axisMap, measConvFactors.angleToEncoder, NULL, measConvFactors.newtonsToSensor, measConvFactors.ampsToSensor, nullptr, measConvFactors.dutycycleToPWM , measConvFactors.bemf2raw, measConvFactors.ktau2raw);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION, _trj_pids->fbk_PidUnits, _trj_pids->out_PidUnits);
-    _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_DIRECT,   _dir_pids->fbk_PidUnits, _dir_pids->out_PidUnits);
+    _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION,   _dir_pids->fbk_PidUnits, _dir_pids->out_PidUnits);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_TORQUE,   _trq_pids->fbk_PidUnits, _trq_pids->out_PidUnits);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_CURRENT,  _cur_pids->fbk_PidUnits, _cur_pids->out_PidUnits);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_VELOCITY, _spd_pids->fbk_PidUnits, _spd_pids->out_PidUnits);
@@ -937,7 +937,7 @@ bool embObjMotionControl::fromConfig_Step2(yarp::os::Searchable &config)
     */
     initializeInterfaces(measConvFactors);
     ImplementPidControl::setConversionUnits(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION, _trj_pids->fbk_PidUnits, _trj_pids->out_PidUnits);
-    ImplementPidControl::setConversionUnits(PidControlTypeEnum::VOCAB_PIDTYPE_DIRECT,   _dir_pids->fbk_PidUnits, _dir_pids->out_PidUnits);
+    ImplementPidControl::setConversionUnits(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION,   _dir_pids->fbk_PidUnits, _dir_pids->out_PidUnits);
     ImplementPidControl::setConversionUnits(PidControlTypeEnum::VOCAB_PIDTYPE_TORQUE,   _trq_pids->fbk_PidUnits, _trq_pids->out_PidUnits);
     ImplementPidControl::setConversionUnits(PidControlTypeEnum::VOCAB_PIDTYPE_CURRENT,  _cur_pids->fbk_PidUnits, _cur_pids->out_PidUnits);
     ImplementPidControl::setConversionUnits(PidControlTypeEnum::VOCAB_PIDTYPE_VELOCITY, _spd_pids->fbk_PidUnits, _spd_pids->out_PidUnits);
@@ -1373,8 +1373,17 @@ bool embObjMotionControl::init()
         yarp::dev::Pid tmp; 
         tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_POSITION,_trj_pids[logico].pid, fisico);
         copyPid_iCub2eo(&tmp, &jconfig.pidtrajectory);
-        tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_DIRECT, _dir_pids[logico].pid, fisico);
+        tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_POSITION, _dir_pids[logico].pid, fisico);
         copyPid_iCub2eo(&tmp, &jconfig.piddirect);
+
+        yError() << "--------------- PID DIRECT ----------------";
+        yError() << "Kp (metric units)=" << _dir_pids[logico].pid.kp << "KP(machine units)="  << jconfig.piddirect.kp;
+        yError() << "Kd (metric units)=" << _dir_pids[logico].pid.kd << "Kd(machine units)="  << jconfig.piddirect.kd;
+        yError() << "Kff (metric units)=" << _dir_pids[logico].pid.kff << "Kd(machine units)="  << jconfig.piddirect.kff;
+        yError() << "lim_output (metric units)=" << _dir_pids[logico].pid.max_output << "Kd(machine units)="  << jconfig.piddirect.limitonoutput;
+        yError() << "-------------------------------------------";
+
+
         tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_TORQUE, _trq_pids[logico].pid, fisico);
         copyPid_iCub2eo(&tmp, &jconfig.pidtorque);
 
@@ -1914,11 +1923,12 @@ bool embObjMotionControl::getPidErrorRaw(const PidControlTypeEnum& pidtype, int 
                 *err = (double) jcore.ofpid.generic.error1;
         }
         break;
-        case VOCAB_PIDTYPE_DIRECT:
+ /*       case VOCAB_PIDTYPE_DIRECT:
         {
             *err=0;  //not yet implemented
             NOT_YET_IMPLEMENTED("getPidErrorRaw VOCAB_PIDTYPE_DIRECT");
         }
+        */
         break;
         case VOCAB_PIDTYPE_TORQUE:
         {
@@ -2021,9 +2031,9 @@ bool embObjMotionControl::getPidsRaw(const PidControlTypeEnum& pidtype, Pid *pid
         case VOCAB_PIDTYPE_POSITION:
             helper_getPosPidsRaw(pids);
             break;
-        case VOCAB_PIDTYPE_DIRECT:
-            helper_getVelPidsRaw(pids);
-            break;
+        // case VOCAB_PIDTYPE_DIRECT:
+        //     helper_getVelPidsRaw(pids);
+        //     break;
         case VOCAB_PIDTYPE_TORQUE:
             helper_getTrqPidsRaw(pids);
             break;
@@ -2059,11 +2069,11 @@ bool embObjMotionControl::getPidReferenceRaw(const PidControlTypeEnum& pidtype, 
             *ref = (double) jcore.ofpid.generic.reference1;
         }
         break;
-        case VOCAB_PIDTYPE_DIRECT:
-        {
-            *ref=0;
-            NOT_YET_IMPLEMENTED("getPidReferenceRaw VOCAB_PIDTYPE_DIRECT");
-        }
+        // case VOCAB_PIDTYPE_DIRECT:
+        // {
+        //     *ref=0;
+        //     NOT_YET_IMPLEMENTED("getPidReferenceRaw VOCAB_PIDTYPE_DIRECT");
+        // }
         break;
         case VOCAB_PIDTYPE_TORQUE:
         {
@@ -4856,9 +4866,9 @@ bool embObjMotionControl::getPidOutputRaw(const PidControlTypeEnum& pidtype, int
             else
                 *out = (double) jcore.ofpid.generic.output;
         break;
-        case VOCAB_PIDTYPE_DIRECT:
-            *out=0;
-        break;
+        // case VOCAB_PIDTYPE_DIRECT:
+        //     *out=0;
+        // break;
         case VOCAB_PIDTYPE_TORQUE:
             if ((eomc_controlmode_torque == jcore.modes.controlmodestatus) ||
                 ((eomc_controlmode_position == jcore.modes.controlmodestatus) && (eOmc_interactionmode_compliant == jcore.modes.interactionmodestatus)))
