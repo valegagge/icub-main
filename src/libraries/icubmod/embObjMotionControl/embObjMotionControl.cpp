@@ -1390,7 +1390,7 @@ bool embObjMotionControl::init()
         yError() << "--------------- PID DIRECT ----------------";
         yError() << "Kp (metric units)=" << _dir_pids[logico].pid.kp << "KP(machine units)="  << jconfig.piddirect.kp;
         yError() << "Kd (metric units)=" << _dir_pids[logico].pid.kd << "Kd(machine units)="  << jconfig.piddirect.kd;
-        yError() << "Kff (metric units)=" << _dir_pids[logico].pid.kff << "Kd(machine units)="  << jconfig.piddirect.kff;
+        yError() << "Kff (metric units)=" << _dir_pids[logico].pid.kff << "Kff(machine units)="  << jconfig.piddirect.kff;
         yError() << "lim_output (metric units)=" << _dir_pids[logico].pid.max_output << "Kd(machine units)="  << jconfig.piddirect.limitonoutput;
         yError() << "-------------------------------------------";
 
@@ -1503,9 +1503,24 @@ bool embObjMotionControl::init()
         yarp::dev::Pid tmp;
         tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_CURRENT, _cur_pids[logico].pid, fisico);
         copyPid_iCub2eo(&tmp, &motor_cfg.pidcurrent);
+
+        yError() << "--------------- PID CURRENT ----------------";
+        yError() << "Kp (metric units)=" << _cur_pids[logico].pid.kp << "KP(machine units)="  << motor_cfg.pidcurrent.kp;
+        yError() << "Kd (metric units)=" << _cur_pids[logico].pid.kd << "Kd(machine units)="  << motor_cfg.pidcurrent.kd;
+        yError() << "Kff (metric units)=" << _cur_pids[logico].pid.kff << "Kff(machine units)="  << motor_cfg.pidcurrent.kff;
+        yError() << "lim_output (metric units)=" << _cur_pids[logico].pid.max_output << "Kd(machine units)="  << motor_cfg.pidcurrent.limitonoutput;
+        yError() << "-------------------------------------------";
                 
         tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_VELOCITY, _spd_pids[logico].pid, fisico);
         copyPid_iCub2eo(&tmp, &motor_cfg.pidspeed);
+
+        yError() << "--------------- PID CURRENT ----------------";
+        yError() << "Kp (metric units)=" << _spd_pids[logico].pid.kp << "KP(machine units)="  << motor_cfg.pidspeed.kp;
+        yError() << "Kd (metric units)=" << _spd_pids[logico].pid.kd << "Kd(machine units)="  << motor_cfg.pidspeed.kd;
+        yError() << "Kff (metric units)=" << _spd_pids[logico].pid.kff << "Kff(machine units)="  << motor_cfg.pidspeed.kff;
+        yError() << "lim_output (metric units)=" << _spd_pids[logico].pid.max_output << "Kd(machine units)="  << motor_cfg.pidspeed.limitonoutput;
+        yError() << "-------------------------------------------";
+
 
         if (false == res->setcheckRemoteValue(protid, &motor_cfg, 10, 0.010, 0.050))
         {
