@@ -551,7 +551,10 @@ bool Parser::parseSelectedMixedControl(yarp::os::Searchable &config) // OK
 bool Parser::parseSelectedPosDirectControl(yarp::os::Searchable &config) // OK
 {
     for (int i = 0; i<_njoints; i++)
-    {
+    {   
+
+	if (_posDirectControlLaw[i] == "none")
+	{continue;}
         // 1) verify that selected control law is defined in file
         Bottle botControlLaw = config.findGroup(_posDirectControlLaw[i]);
         if (botControlLaw.isNull())
@@ -624,6 +627,9 @@ bool Parser::parseSelectedVelDirectControl(yarp::os::Searchable &config) // OK
 {
     for (int i = 0; i<_njoints; i++)
     {
+	if (_velDirectControlLaw[i] == "none")
+        {continue;}
+
         // 1) verify that selected control law is defined in file
         Bottle botControlLaw = config.findGroup(_velDirectControlLaw[i]);
         if (botControlLaw.isNull())

@@ -627,10 +627,10 @@ bool embObjMotionControl::updatedJointsetsCfgWithControlInfo()
         _jsets[s].cfg.pid_output_types.veltrj_ctrl_out_type = _trj_pids[joint].out_type;
         _jsets[s].cfg.pid_output_types.mixtrj_ctrl_out_type = _trj_pids[joint].out_type;
 
-        _jsets[s].cfg.pid_output_types.posdir_ctrl_out_type = _dir_pids[joint].out_type;
-        _jsets[s].cfg.pid_output_types.veldir_ctrl_out_type = _dir_pids[joint].out_type;
-        //_jsets[s].cfg.pid_output_types.posdir_ctrl_out_type = _trj_pids[joint].out_type;
-        //_jsets[s].cfg.pid_output_types.veldir_ctrl_out_type = _trj_pids[joint].out_type;
+        //_jsets[s].cfg.pid_output_types.posdir_ctrl_out_type = _dir_pids[joint].out_type;
+        //_jsets[s].cfg.pid_output_types.veldir_ctrl_out_type = _dir_pids[joint].out_type;
+        _jsets[s].cfg.pid_output_types.posdir_ctrl_out_type = _trj_pids[joint].out_type;
+        _jsets[s].cfg.pid_output_types.veldir_ctrl_out_type = _trj_pids[joint].out_type;
 
         _jsets[s].cfg.pid_output_types.torque_ctrl_out_type = _trq_pids[joint].out_type;
 
@@ -919,7 +919,7 @@ bool embObjMotionControl::fromConfig_Step2(yarp::os::Searchable &config)
     ///////////////INIT INTERFACES
     _measureConverter = new ControlBoardHelper(_njoints, _axisMap, measConvFactors.angleToEncoder, NULL, measConvFactors.newtonsToSensor, measConvFactors.ampsToSensor, nullptr, measConvFactors.dutycycleToPWM , measConvFactors.bemf2raw, measConvFactors.ktau2raw);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION, _trj_pids->fbk_PidUnits, _trj_pids->out_PidUnits);
-    _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION,   _dir_pids->fbk_PidUnits, _dir_pids->out_PidUnits);
+    //_measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_POSITION,   _dir_pids->fbk_PidUnits, _dir_pids->out_PidUnits);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_TORQUE,   _trq_pids->fbk_PidUnits, _trq_pids->out_PidUnits);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_CURRENT,  _cur_pids->fbk_PidUnits, _cur_pids->out_PidUnits);
     _measureConverter->set_pid_conversion_units(PidControlTypeEnum::VOCAB_PIDTYPE_VELOCITY, _spd_pids->fbk_PidUnits, _spd_pids->out_PidUnits);
@@ -1121,8 +1121,8 @@ bool embObjMotionControl::isTorqueControlEnabled(int joint)
 
 bool embObjMotionControl::isVelocityControlEnabled(int joint)
 {
-    return (_dir_pids[joint].enabled);
-    //return (_trj_pids[joint].enabled);
+    //return (_dir_pids[joint].enabled);
+    return (_trj_pids[joint].enabled);
 }
 
 
@@ -1373,8 +1373,8 @@ bool embObjMotionControl::init()
         yarp::dev::Pid tmp; 
         tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_POSITION,_trj_pids[logico].pid, fisico);
         copyPid_iCub2eo(&tmp, &jconfig.pidtrajectory);
-        tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_POSITION, _dir_pids[logico].pid, fisico);
-        copyPid_iCub2eo(&tmp, &jconfig.piddirect);
+        //tmp = _measureConverter->convert_pid_to_machine(yarp::dev::VOCAB_PIDTYPE_POSITION, _dir_pids[logico].pid, fisico);
+        //copyPid_iCub2eo(&tmp, &jconfig.piddirect);
 
         yError() << "--------------- PID DIRECT ----------------";
         yError() << "Kp (metric units)=" << _dir_pids[logico].pid.kp << "KP(machine units)="  << jconfig.piddirect.kp;
